@@ -1,0 +1,113 @@
+<resources>
+    <string name="app_name">Baku Transit</string>
+    <string name="ai_assistant">AI Assistant</string>
+    <string name="nearest_stops">Nearest Stops</string>
+    <string name="nearest_stop_label">Nearest stop</string>
+    <string name="metro_lines">Metro Lines</string>
+    <string name="bus_routes">Bus Routes</string>
+    <string name="search_hint">Where are you going?</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="bakikart_system">BakiKart System</string>
+    <string name="bakikart_info">It is a unified payment card for public transport. Plastic cards can be obtained from metro stations and terminals at stops.</string>
+    <string name="fare_standard">Standard fare: 0.60 AZN</string>
+    <string name="fare_aero">Aero Express: 1.50 AZN</string>
+    <string name="guidelines">Guidelines</string>
+
+    <string name="map_tab">Map</string>
+    <string name="buses_tab">Buses</string>
+    <string name="extra_tab">Extra</string>
+    <string name="metro_tab">Metro</string>
+    <string name="settings_tab">Settings</string>
+
+    <string name="settings_title">Settings and Information</string>
+    <string name="appearance_lang">Appearance and Language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="current_lang">Current language</string>
+    <string name="legal_info">Legal and Extra Information</string>
+
+    <string name="metro_title">Baku Metro</string>
+    <string name="scheme_map">Scheme Map</string>
+    <string name="repair_warning">Repairs ongoing at Nizami - 28 May!</string>
+    <string name="repair_details">Delays possible at Nizami - 28 May tunnel line due to repair works.</string>
+    <string name="fare_label">Fare</string>
+    <string name="interval_label">Interval</string>
+    <string name="lines_label">Lines</string>
+    <string name="close_button">Close</string>
+    <string name="more_info">Click for more info</string>
+    <string name="ride_count">Ride count: %1$d</string>
+    <string name="total_standard">Total (Standard): %1$.2f AZN</string>
+    <string name="total_aero">Total (Aero): %1$.2f AZN</string>
+    <string name="guideline_1">1. Metro and BakuBus fare is 0.60 AZN.</string>
+    <string name="guideline_2">2. Payment only via BakiKart (plastic or mobile app).</string>
+    <string name="guideline_3">3. Enter through the front door, exit through middle/back.</string>
+    <string name="guideline_4">4. Giving up your seat to elderly/needy is a sign of culture.</string>
+    <string name="safe_mode_title">🛡️ Static Optimization Mode</string>
+    <string name="live_map_title">📍 Live Transit Map</string>
+    <string name="legend_rail">Rail</string>
+    <string name="st_red_line">Red</string>
+    <string name="st_green_line">Green</string>
+    <string name="st_purple_line">Purple</string>
+
+    <string name="trip_planner_title">Smart Trip Planner</string>
+    <string name="origin_label">From (e.g., 28 May)</string>
+    <string name="destination_label">To (e.g., Koroglu)</string>
+    <string name="plan_button">Find Best Route</string>
+    <string name="suggested_routes">Suggested Routes</string>
+    <string name="scheme_zoom_hint">Pinch to zoom</string>
+    <string name="version_label">Version</string>
+    <string name="support_label">Support</string>
+    <string name="legal_rules">Rules: Fully compliant with Baku Transport Agency passenger rules.</string>
+    <string name="new_tariff_label">New Tariff/Price</string>
+    <string name="estimated_interval_label">Station/Bus Interval</string>
+    <string name="lines_routes_label">Passing Lines &amp; Routes</string>
+    <string name="coordinates_label">Coordinates</string>
+    <string name="details_click_hint">Click for more information</string>
+    <string name="stop_type_metro">Metro Station</string>
+    <string name="stop_type_bus">Bus Stop</string>
+    <string name="stop_type_train">Train / Hub</string>
+    <string name="stop_type_bicycle">Bicycle Stand</string>
+    <string name="stop_type_label">Type</string>
+    <string name="show_route">Show Route</string>
+    <string name="walking_path">Walking path</string>
+    <string name="tools_tab">Tools</string>
+    <string name="bakikart_calc">BakiKart Calculator</string>
+
+
+    <!-- Metro Stations -->
+    <string name="st_iceriseher">Icherisheher</string>
+    <string name="st_sahil">Sahil</string>
+    <string name="st_28may">May 28</string>
+    <string name="st_genclik">Ganjlik</string>
+    <string name="st_nermanov">Nariman Narimanov</string>
+    <string name="st_bakmil">Bakmil</string>
+    <string name="st_ulduz">Ulduz</string>
+    <string name="st_koroglu">Koroglu</string>
+    <string name="st_qaraqarayev">Gara Garayev</string>
+    <string name="st_neftciler">Neftchilar</string>
+    <string name="st_xalqalardoslugu">Khalglar Dostlugu</string>
+    <string name="st_ehmedli">Ahmedli</string>
+    <string name="st_heziaslanov">Hezi Aslanov</string>
+    <string name="st_dernegul">Dernegul</string>
+    <string name="st_azadliqprospekti">Azadlig Avenue</string>
+    <string name="st_nesimi">Nasimi</string>
+    <string name="st_memarecemi">Memar Ajami</string>
+    <string name="st_20yanvar">January 20</string>
+    <string name="st_insaatcilar">Inshaatchilar</string>
+    <string name="st_elmlerakademiyasi">Elmlar Akademiyasi</string>
+    <string name="st_nizami">Nizami</string>
+    <string name="st_cefercabbarli">Jafar Jabbarly</string>
+    <string name="st_xetai">Khatai</string>
+    <string name="st_xocesen">Khojasen</string>
+    <string name="st_avtovagzal">Bus Terminal</string>
+    <string name="st_8noyabr">November 8</string>
+
+    <string name="credits_tab">Credits</string>
+    <string name="developer_label">Developer</string>
+    <string name="developer_name">Zaur Alizada</string>
+    <string name="developer_email">suleymaniye2012zaur@gmail.com</string>
+    <string name="copyright_label">© 2026 Baku Transit</string>
+    <string name="credits_description">This app was created to make public transport in Baku more accessible.</string>
+</resources>

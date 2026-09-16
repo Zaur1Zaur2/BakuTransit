@@ -1,0 +1,113 @@
+<resources>
+    <string name="app_name">Баку Транзит</string>
+    <string name="ai_assistant">ИИ Помощник</string>
+    <string name="nearest_stops">Ближайшие остановки</string>
+    <string name="nearest_stop_label">Ближайшая остановка</string>
+    <string name="metro_lines">Линии метро</string>
+    <string name="bus_routes">Автобусные маршруты</string>
+    <string name="search_hint">Куда вы хотите поехать?</string>
+    <string name="login">Войти</string>
+    <string name="register">Регистрация</string>
+    <string name="email">Эл. почта</string>
+    <string name="password">Пароль</string>
+    <string name="bakikart_system">Система BakiKart</string>
+    <string name="bakikart_info">Единая платежная карта для общественного транспорта. Пластиковые карты можно приобрести на станциях метро и в терминалах на остановках.</string>
+    <string name="fare_standard">Стандартный проезд: 0.60 AZN</string>
+    <string name="fare_aero">Aero Express: 1.50 AZN</string>
+    <string name="guidelines">Правила</string>
+
+    <string name="map_tab">Карта</string>
+    <string name="buses_tab">Автобусы</string>
+    <string name="extra_tab">Доп.</string>
+    <string name="metro_tab">Метро</string>
+    <string name="settings_tab">Настройки</string>
+
+    <string name="settings_title">Настройки и Информация</string>
+    <string name="appearance_lang">Внешний вид и Язык</string>
+    <string name="dark_mode">Ночной режим</string>
+    <string name="current_lang">Текущий язык</string>
+    <string name="legal_info">Юридическая и доп. информация</string>
+
+    <string name="metro_title">Бакинское Метро</string>
+    <string name="scheme_map">Схема</string>
+    <string name="repair_warning">Ремонт на переходе Низами - 28 Мая!</string>
+    <string name="repair_details">Возможны задержки на линии Низами - 28 Мая из-за ремонтных работ.</string>
+    <string name="fare_label">Стоимость проезда</string>
+    <string name="interval_label">Интервал</string>
+    <string name="lines_label">Линии</string>
+    <string name="close_button">Закрыть</string>
+    <string name="more_info">Нажмите для подробностей</string>
+    <string name="ride_count">Кол-во поездок: %1$d</string>
+    <string name="total_standard">Итого (Стандарт): %1$.2f AZN</string>
+    <string name="total_aero">Итого (Аэро): %1$.2f AZN</string>
+    <string name="guideline_1">1. Стоимость проезда в метро и BakuBus составляет 0.60 AZN.</string>
+    <string name="guideline_2">2. Оплата только через BakiKart (пластик или моб. приложение).</string>
+    <string name="guideline_3">3. Вход через переднюю дверь, выход через среднюю/заднюю.</string>
+    <string name="guideline_4">4. Уступать место пожилым и нуждающимся — признак культуры.</string>
+    <string name="safe_mode_title">🛡️ Режим статической оптимизации</string>
+    <string name="live_map_title">📍 Живая карта транспорта</string>
+    <string name="legend_rail">Железная дорога</string>
+    <string name="st_red_line">Красная</string>
+    <string name="st_green_line">Зеленая</string>
+    <string name="st_purple_line">Фиолетовая</string>
+
+    <string name="trip_planner_title">Умный планировщик поездок</string>
+    <string name="origin_label">Откуда (напр. 28 Мая)</string>
+    <string name="destination_label">Куда (напр. Короглу)</string>
+    <string name="plan_button">Найти лучший маршрут</string>
+    <string name="suggested_routes">Предложенные маршруты</string>
+    <string name="scheme_zoom_hint">Увеличьте для просмотра</string>
+    <string name="version_label">Версия</string>
+    <string name="support_label">Поддержка</string>
+    <string name="legal_rules">Правила: Полное соответствие правилам БТА.</string>
+    <string name="new_tariff_label">Новый тариф/Цена</string>
+    <string name="estimated_interval_label">Интервал движения</string>
+    <string name="lines_routes_label">Проходящие линии и маршруты</string>
+    <string name="coordinates_label">Координаты</string>
+    <string name="details_click_hint">Нажмите для подробностей</string>
+    <string name="stop_type_metro">Станция метро</string>
+    <string name="stop_type_bus">Автобусная остановка</string>
+    <string name="stop_type_train">Поезд / Хаб</string>
+    <string name="stop_type_bicycle">Велопарковка</string>
+    <string name="stop_type_label">Тип</string>
+    <string name="show_route">Показать маршрут</string>
+    <string name="walking_path">Пешеходный путь</string>
+    <string name="tools_tab">Инструменты</string>
+    <string name="bakikart_calc">Калькулятор BakiKart</string>
+
+
+    <!-- Metro Stations -->
+    <string name="st_iceriseher">Ичеришехер</string>
+    <string name="st_sahil">Сахил</string>
+    <string name="st_28may">28 Мая</string>
+    <string name="st_genclik">Гянджлик</string>
+    <string name="st_nermanov">Нариман Нариманов</string>
+    <string name="st_bakmil">Бакмил</string>
+    <string name="st_ulduz">Улдуз</string>
+    <string name="st_koroglu">Короглу</string>
+    <string name="st_qaraqarayev">Кара Караев</string>
+    <string name="st_neftciler">Нефтчиляр</string>
+    <string name="st_xalqalardoslugu">Халглар Достлугу</string>
+    <string name="st_ehmedli">Ахмедли</string>
+    <string name="st_heziaslanov">Ази Асланов</string>
+    <string name="st_dernegul">Дарнагюль</string>
+    <string name="st_azadliqprospekti">Азадлыг проспекти</string>
+    <string name="st_nesimi">Насими</string>
+    <string name="st_memarecemi">Мемар Аджеми</string>
+    <string name="st_20yanvar">20 Января</string>
+    <string name="st_insaatcilar">Иншаатчылар</string>
+    <string name="st_elmlerakademiyasi">Элмляр Академиясы</string>
+    <string name="st_nizami">Низами</string>
+    <string name="st_cefercabbarli">Джафар Джаббарлы</string>
+    <string name="st_xetai">Хатаи</string>
+    <string name="st_xocesen">Ходжасан</string>
+    <string name="st_avtovagzal">Автовокзал</string>
+    <string name="st_8noyabr">8 Ноября</string>
+
+    <string name="credits_tab">Авторы</string>
+    <string name="developer_label">Разработчик</string>
+    <string name="developer_name">Заур Ализаде</string>
+    <string name="developer_email">suleymaniye2012zaur@gmail.com</string>
+    <string name="copyright_label">© 2026 Баку Транзит</string>
+    <string name="credits_description">Это приложение создано для повышения доступности общественного транспорта в Баку.</string>
+</resources>

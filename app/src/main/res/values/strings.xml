@@ -1,0 +1,113 @@
+<resources>
+    <string name="app_name">Baku Transit</string>
+    <string name="ai_assistant">Süni İntellekt Köyməkçisi</string>
+    <string name="nearest_stops">Yaxınlıqdakı dayanacaqlar</string>
+    <string name="nearest_stop_label">Ən yaxın dayanacaq</string>
+    <string name="metro_lines">Metro xətləri</string>
+    <string name="bus_routes">Avtobus marşrutları</string>
+    <string name="search_hint">Hara getmək istəyirsiniz?</string>
+    <string name="login">Daxil ol</string>
+    <string name="register">Qeydiyyat</string>
+    <string name="email">E-poçt</string>
+    <string name="password">Şifrə</string>
+    <string name="bakikart_system">BakıKart Sistemi</string>
+    <string name="bakikart_info">İctimai nəqliyyatda vahid ödəniş kartıdır. Plastik kartları metro stansiyalarından və dayanacaqlardakı terminallardan əldə etmək olar.</string>
+    <string name="fare_standard">Standart gediş: 0.60 AZN</string>
+    <string name="fare_aero">Aero Express: 1.50 AZN</string>
+    <string name="guidelines">Qaydalar</string>
+
+    <string name="map_tab">Xəritə</string>
+    <string name="buses_tab">Avtobuslar</string>
+    <string name="extra_tab">Əlavə</string>
+    <string name="metro_tab">Metro</string>
+    <string name="settings_tab">Ayarlar</string>
+
+    <string name="settings_title">Tənzimləmələr və İnformasiya</string>
+    <string name="appearance_lang">Görünüş və Dil</string>
+    <string name="dark_mode">Gecə Rejimi (Dark Mode)</string>
+    <string name="current_lang">Cari aktiv dil</string>
+    <string name="legal_info">Hüquqi və Əlavə Məlumatlar</string>
+
+    <string name="metro_title">Bakı Metrosu</string>
+    <string name="scheme_map">Tam Xəritə (Scheme)</string>
+    <string name="repair_warning">Nizami - 28 May keçidində təmir işləri gedir!</string>
+    <string name="repair_details">Nizami - 28 May tunel xəttində təmir-bərpa işləri səbəbindən ləngimələr ola bilər.</string>
+    <string name="fare_label">Gediş haqqı</string>
+    <string name="interval_label">İnterval</string>
+    <string name="lines_label">Xətlər</string>
+    <string name="close_button">Bağla</string>
+    <string name="more_info">Ətraflı məlumat üçün klikləyin</string>
+    <string name="ride_count">Gediş sayı: %1$d</string>
+    <string name="total_standard">Cəmi (Standart): %1$.2f AZN</string>
+    <string name="total_aero">Cəmi (Aero): %1$.2f AZN</string>
+    <string name="guideline_1">1. Metro və BakuBus avtobuslarında gediş haqqı 0.60 AZN-dir.</string>
+    <string name="guideline_2">2. Ödəniş yalnız BakıKart (plastik və ya mobil tətbiq) vasitəsilə həyata keçirilir.</string>
+    <string name="guideline_3">3. Avtobusa ön qapıdan minib, orta və ya arxa qapıdan düşmək lazımdır.</string>
+    <string name="guideline_4">4. İctimai nəqliyyatda yaşlılara və ehtiyacı olanlara yer vermək mədəniyyət göstəricisidir.</string>
+    <string name="safe_mode_title">🛡️ Statik Optimallıq Rejimi</string>
+    <string name="live_map_title">📍 Canlı Nəqliyyat Xəritəsi</string>
+    <string name="legend_rail">Dəmir yolu</string>
+    <string name="st_red_line">Qırmızı</string>
+    <string name="st_green_line">Yaşıl</string>
+    <string name="st_purple_line">Bənövşəyi</string>
+
+    <string name="trip_planner_title">Ağıllı Səyahət Planlayıcısı</string>
+    <string name="origin_label">Haradan (məs. 28 May)</string>
+    <string name="destination_label">Haraya (məs. Koroğlu)</string>
+    <string name="plan_button">Ən yaxşı marşrutu tap</string>
+    <string name="suggested_routes">Təklif olunan marşrutlar</string>
+    <string name="scheme_zoom_hint">Böyütmək üçün sıxın</string>
+    <string name="version_label">Versiya</string>
+    <string name="support_label">Dəstək</string>
+    <string name="legal_rules">Qaydalar: Bakı Nəqliyyat Agentliyi sərnişindaşıma qaydalarına tam uyğundur.</string>
+    <string name="new_tariff_label">Yeni Tarif/Qiymət</string>
+    <string name="estimated_interval_label">Qatarlararası/Avtobus İntervalı</string>
+    <string name="lines_routes_label">Keçən Xətlər və Marşrutlar</string>
+    <string name="coordinates_label">Koordinatlar</string>
+    <string name="details_click_hint">Ətraflı məlumat üçün klikləyin</string>
+    <string name="stop_type_metro">Metro Stansiyası</string>
+    <string name="stop_type_bus">Avtobus Dayanacağı</string>
+    <string name="stop_type_train">Qatar / Hub</string>
+    <string name="stop_type_bicycle">Velosiped Dayanacağı</string>
+    <string name="stop_type_label">Növ</string>
+    <string name="show_route">Marşrutu göstər</string>
+    <string name="walking_path">Piyada yolu</string>
+    <string name="tools_tab">Alətlər</string>
+    <string name="bakikart_calc">BakiKart Kalkulyatoru</string>
+
+
+    <!-- Metro Stations -->
+    <string name="st_iceriseher">İçərişəhər</string>
+    <string name="st_sahil">Sahil</string>
+    <string name="st_28may">28 May</string>
+    <string name="st_genclik">Gənclik</string>
+    <string name="st_nermanov">Nəriman Nərimanov</string>
+    <string name="st_bakmil">Bakmil</string>
+    <string name="st_ulduz">Ulduz</string>
+    <string name="st_koroglu">Koroğlu</string>
+    <string name="st_qaraqarayev">Qara Qarayev</string>
+    <string name="st_neftciler">Neftçilər</string>
+    <string name="st_xalqalardoslugu">Xalqlar Dostluğu</string>
+    <string name="st_ehmedli">Əhmədli</string>
+    <string name="st_heziaslanov">Həzi Aslanov</string>
+    <string name="st_dernegul">Dərnəgül</string>
+    <string name="st_azadliqprospekti">Azadlıq Prospekti</string>
+    <string name="st_nesimi">Nəsimi</string>
+    <string name="st_memarecemi">Memar Əcəmi</string>
+    <string name="st_20yanvar">20 Yanvar</string>
+    <string name="st_insaatcilar">İnşaatçılar</string>
+    <string name="st_elmlerakademiyasi">Elmlər Akademiyası</string>
+    <string name="st_nizami">Nizami</string>
+    <string name="st_cefercabbarli">Cəfər Cabbarlı</string>
+    <string name="st_xetai">Xətai</string>
+    <string name="st_xocesen">Xocəsən</string>
+    <string name="st_avtovagzal">Avtovağzal</string>
+    <string name="st_8noyabr">8 Noyabr</string>
+
+    <string name="credits_tab">Müəlliflər</string>
+    <string name="developer_label">Tərtibatçı</string>
+    <string name="developer_name">Zaur Alizada</string>
+    <string name="developer_email">suleymaniye2012zaur@gmail.com</string>
+    <string name="copyright_label">© 2026 Baku Transit</string>
+    <string name="credits_description">Bu tətbiq Bakı şəhərinin ictimai nəqliyyatını daha əlçatan etmək üçün yaradılmışdır.</string>
+</resources>
