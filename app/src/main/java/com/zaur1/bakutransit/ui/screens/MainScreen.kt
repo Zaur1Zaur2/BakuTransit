@@ -1,5 +1,7 @@
 package com.zaur1.bakutransit.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -8,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,9 +33,12 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
     val chatViewModel: ChatViewModel = viewModel()
-    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var showChat by remember { mutableStateOf(false) }
+    
+    // OTA Update Logic
+    val newVersion by transitViewModel.newVersionAvailable.collectAsState()
+    val context = LocalContext.current
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -51,31 +57,31 @@ fun MainScreen(
                     val currentDestination = navBackStackEntry?.destination
 
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Place, contentDescription = null) },
+                        icon = { Icon(Icons.Default.Place, null) },
                         label = { Text(stringResource(R.string.map_tab)) },
                         selected = currentDestination?.route == "map",
                         onClick = { navController.navigate("map") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.List, contentDescription = null) },
+                        icon = { Icon(Icons.Default.List, null) },
                         label = { Text(stringResource(R.string.buses_tab)) },
                         selected = currentDestination?.route == "bus_list",
                         onClick = { navController.navigate("bus_list") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Star, contentDescription = null) },
+                        icon = { Icon(Icons.Default.Star, null) },
                         label = { Text(stringResource(R.string.tools_tab)) },
-                        selected = currentDestination?.route == "extra" || currentDestination?.route == "trip_planner" || currentDestination?.route == "metro_scheme",
+                        selected = currentDestination?.route == "extra",
                         onClick = { navController.navigate("extra") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                        label = { Text(stringResource(R.string.bakikart_calc)) },
-                        selected = currentDestination?.route == "fare",
-                        onClick = { navController.navigate("fare") }
+                        icon = { Icon(Icons.Default.Info, null) },
+                        label = { Text("Müəllif") },
+                        selected = currentDestination?.route == "credits",
+                        onClick = { navController.navigate("credits") }
                     )
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        icon = { Icon(Icons.Default.Settings, null) },
                         label = { Text(stringResource(R.string.settings_tab)) },
                         selected = currentDestination?.route == "settings",
                         onClick = { navController.navigate("settings") }
@@ -95,6 +101,28 @@ fun MainScreen(
                 composable("metro_scheme") { MetroSchemeScreen(onBack = { navController.popBackStack() }) }
                 composable("trip_planner") { TripPlannerScreen(transitViewModel) }
                 composable("credits") { CreditsScreen() }
+            }
+
+            // OTA Dialog
+            newVersion?.let { version ->
+                AlertDialog(
+                    onDismissRequest = { /* Keep it visible */ },
+                    title = { Text("Yeni Yenilənmə Mövcuddur!") },
+                    text = { Text("Tətbiqin yeni versiyası ($version) hazırdır. Lütfən, ən son APK-nı yükləyərək yeniləyin.") },
+                    confirmButton = {
+                        Button(onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest"))
+                            context.startActivity(intent)
+                        }) {
+                            Text("İndi Yüklə")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { transitViewModel.setDestination(null) /* Just a dummy to trigger state */ }) {
+                            Text("Bağla")
+                        }
+                    }
+                )
             }
 
             if (showChat) {
@@ -155,7 +183,7 @@ fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, onNavigateToCred
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.legal_info), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("${stringResource(R.string.version_label)}: 1.1.0", style = MaterialTheme.typography.bodyMedium)
+                    Text("${stringResource(R.string.version_label)}: 1.1.1", style = MaterialTheme.typography.bodyMedium)
                     Text("${stringResource(R.string.support_label)}: support@bakutransit.live", style = MaterialTheme.typography.bodyMedium)
                     Text(stringResource(R.string.legal_rules), style = MaterialTheme.typography.bodySmall)
                     
@@ -165,7 +193,7 @@ fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, onNavigateToCred
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
                     ) {
-                        Text(stringResource(R.string.credits_tab))
+                        Text("Credits (Müəlliflər)")
                     }
                 }
             }

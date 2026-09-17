@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import java.util.Properties
 
 plugins {
@@ -15,8 +16,8 @@ android {
         applicationId = "com.zaur1.bakutransit"
         minSdk = 28
         targetSdk = 30
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -48,6 +49,13 @@ android {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            
+            applicationVariants.all {
+                outputs.all {
+                    val output = this as BaseVariantOutputImpl
+                    output.outputFileName = "v.1.1.1.apk"
+                }
+            }
         }
     }
 
