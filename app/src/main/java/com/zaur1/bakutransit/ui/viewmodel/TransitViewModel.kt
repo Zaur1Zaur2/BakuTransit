@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
+import java.util.Locale
 import kotlin.math.*
 
 class TransitViewModel(private val repository: TransitRepository) : ViewModel() {
@@ -92,7 +93,8 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        if (latestTag != "v1.1.3") _newVersion.value = latestTag
+                        // Update to match current version
+                        if (latestTag != "v1.1.4") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
             }
@@ -101,13 +103,13 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun downloadAndInstallApk(context: Context) {
         _isDownloading.value = true
-        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "BakuTransit_Update.apk")
+        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.4.apk")
         if (destinationFile.exists()) destinationFile.delete()
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.3.apk"))
-            .setTitle("Baku Transit Yeniləmə")
-            .setDescription("Yeni versiya yüklənir...")
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.4.apk"))
+            .setTitle("Baku Transit")
+            .setDescription("Yenilənmə yüklənir...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationUri(Uri.fromFile(destinationFile))
 
@@ -124,10 +126,11 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
             }
         }
         
+        val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
+            context.registerReceiver(onComplete, filter, Context.RECEIVER_EXPORTED)
         } else {
-            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+            context.registerReceiver(onComplete, filter)
         }
     }
 
@@ -170,6 +173,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private fun executeRouting(o: LatLng, d: LatLng) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                // Ensure profile=foot for walking
                 val foot = fetchGH(o, d, "foot")
                 _routePoints.value = foot.first
                 _footInfo.value = foot.second
@@ -206,8 +210,24 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
     }
 
+    fun updateLocale(context: Context, lang: String) {
+        val locale = when(lang) {
+            "ENG" -> Locale.ENGLISH
+            "RUS" -> Locale("ru")
+            else -> Locale("az")
+        }
+        Locale.setDefault(locale)
+        val config = context.resources.configuration
+        config.setLocale(locale)
+        context.createConfigurationContext(config)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+    }
+
     override fun onCleared() {
         super.onCleared()
-        locCallback?.let { fusedClient?.removeLocationUpdates(it) }
+        val callback = locCallback
+        if (callback != null) {
+            fusedClient?.removeLocationUpdates(callback)
+        }
     }
 }
