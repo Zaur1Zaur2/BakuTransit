@@ -16,8 +16,8 @@ android {
         applicationId = "com.zaur1.bakutransit"
         minSdk = 28
         targetSdk = 30
-        versionCode = 3
-        versionName = "1.1.2"
+        versionCode = 4
+        versionName = "1.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -53,7 +53,7 @@ android {
             applicationVariants.all {
                 outputs.all {
                     val output = this as BaseVariantOutputImpl
-                    output.outputFileName = "v.1.1.2.apk"
+                    output.outputFileName = "v.1.1.3.apk"
                 }
             }
         }

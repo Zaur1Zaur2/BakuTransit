@@ -83,7 +83,6 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         }
     }
 
-    // --- OTA UPDATE CHECK ---
     fun checkForUpdates() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -93,7 +92,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        if (latestTag != "v1.1.2") _newVersion.value = latestTag
+                        if (latestTag != "v1.1.3") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
             }
@@ -106,7 +105,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         if (destinationFile.exists()) destinationFile.delete()
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.2.apk"))
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.3.apk"))
             .setTitle("Baku Transit Yeniləmə")
             .setDescription("Yeni versiya yüklənir...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -141,7 +140,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         context.startActivity(installIntent)
     }
 
-    // --- GPS & ROUTING ---
+    // GPS & ROUTING
     private var fusedClient: FusedLocationProviderClient? = null
     private var locCallback: LocationCallback? = null
 
@@ -204,7 +203,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         val dLat = Math.toRadians(l2.latitude - l1.latitude)
         val dLon = Math.toRadians(l2.longitude - l1.longitude)
         val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(l1.latitude)) * cos(Math.toRadians(l2.latitude)) * sin(dLon/2) * sin(dLon/2)
-        return r * 2.0 * atan2(sqrt(a), sqrt(1 - a))
+        return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
     }
 
     override fun onCleared() {
