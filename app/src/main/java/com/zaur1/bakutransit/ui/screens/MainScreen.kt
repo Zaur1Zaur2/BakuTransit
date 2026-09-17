@@ -36,8 +36,8 @@ fun MainScreen(
     val sheetState = rememberModalBottomSheetState()
     var showChat by remember { mutableStateOf(false) }
     
-    // OTA Update Logic
     val newVersion by transitViewModel.newVersionAvailable.collectAsState()
+    val isDownloading by transitViewModel.isDownloading.collectAsState()
     val context = LocalContext.current
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -97,7 +97,7 @@ fun MainScreen(
                     onNavigateToPlanner = { navController.navigate("trip_planner") }
                 ) }
                 composable("fare") { FareHubScreen() }
-                composable("settings") { SettingsAndInfoScreen(settingsViewModel, onNavigateToCredits = { navController.navigate("credits") }) }
+                composable("settings") { SettingsAndInfoScreen(settingsViewModel, transitViewModel, onNavigateToCredits = { navController.navigate("credits") }) }
                 composable("metro_scheme") { MetroSchemeScreen(onBack = { navController.popBackStack() }) }
                 composable("trip_planner") { TripPlannerScreen(transitViewModel) }
                 composable("credits") { CreditsScreen() }
@@ -108,17 +108,20 @@ fun MainScreen(
                 AlertDialog(
                     onDismissRequest = { /* Keep it visible */ },
                     title = { Text("Yeni Yenilənmə Mövcuddur!") },
-                    text = { Text("Tətbiqin yeni versiyası ($version) hazırdır. Lütfən, ən son APK-nı yükləyərək yeniləyin.") },
+                    text = { Text("Tətbiqin yeni versiyası ($version) hazırdır. İndi yükləyib quraşdıraq?") },
                     confirmButton = {
-                        Button(onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest"))
-                            context.startActivity(intent)
-                        }) {
-                            Text("İndi Yüklə")
+                        if (isDownloading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        } else {
+                            Button(onClick = {
+                                transitViewModel.downloadAndInstallApk(context)
+                            }) {
+                                Text("Yüklə və Quraşdır")
+                            }
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { transitViewModel.setDestination(null) /* Just a dummy to trigger state */ }) {
+                        TextButton(onClick = { transitViewModel.setDestination(null) }) {
                             Text("Bağla")
                         }
                     }
@@ -139,7 +142,7 @@ fun MainScreen(
 }
 
 @Composable
-fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, onNavigateToCredits: () -> Unit = {}) {
+fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, transitViewModel: TransitViewModel, onNavigateToCredits: () -> Unit = {}) {
     val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
     val currentLang by settingsViewModel.language.collectAsState()
 
@@ -183,11 +186,18 @@ fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, onNavigateToCred
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.legal_info), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("${stringResource(R.string.version_label)}: 1.1.1", style = MaterialTheme.typography.bodyMedium)
+                    Text("${stringResource(R.string.version_label)}: 1.1.2", style = MaterialTheme.typography.bodyMedium)
                     Text("${stringResource(R.string.support_label)}: support@bakutransit.live", style = MaterialTheme.typography.bodyMedium)
-                    Text(stringResource(R.string.legal_rules), style = MaterialTheme.typography.bodySmall)
                     
                     Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedButton(
+                        onClick = { transitViewModel.checkForUpdates() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Yenilənmələri yoxla")
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
                     Button(
                         onClick = onNavigateToCredits,
                         modifier = Modifier.fillMaxWidth(),

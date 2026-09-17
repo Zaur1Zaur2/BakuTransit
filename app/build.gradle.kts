@@ -16,8 +16,8 @@ android {
         applicationId = "com.zaur1.bakutransit"
         minSdk = 28
         targetSdk = 30
-        versionCode = 2
-        versionName = "1.1.1"
+        versionCode = 3
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -32,7 +32,7 @@ android {
         
         buildConfigField("String", "MAPTILER_API_KEY", "\"${localProperties.getProperty("MAPTILER_API_KEY") ?: ""}\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY") ?: ""}\"")
-        buildConfigField("String", "GRAPHHOPPER_API_KEY", "\"e82b32df-fcd5-4dc6-88e9-536ed3e2e4db\"")
+        buildConfigField("String", "GRAPHHOPPER_API_KEY", "\"${localProperties.getProperty("GRAPHHOPPER_API_KEY") ?: ""}\"")
     }
 
     signingConfigs {
@@ -53,7 +53,7 @@ android {
             applicationVariants.all {
                 outputs.all {
                     val output = this as BaseVariantOutputImpl
-                    output.outputFileName = "v.1.1.1.apk"
+                    output.outputFileName = "v.1.1.2.apk"
                 }
             }
         }

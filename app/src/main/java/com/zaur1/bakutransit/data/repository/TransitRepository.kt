@@ -55,13 +55,27 @@ class TransitRepository(private val transitDao: TransitDao) {
             TransitStopEntity("bus_s3", "Port Baku", TransportType.BUS, 40.3758, 49.8650, emptyList())
         )
 
-        val routes = listOf(
-            BusRouteEntity("b1", "1", "28 May - Neftçilər", "28 May", "Neftçilər", "06:00-00:00", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r3", "m_r9")),
-            BusRouteEntity("b5", "5", "Nərimanov - 20-ci Sahə", "Nərimanov", "20-ci Sahə", "06:00-00:00", 7, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r5")),
-            BusRouteEntity("b88", "88", "Dərnəgül - 20-ci Sahə", "Dərnəgül", "20-ci Sahə", "06:00-00:00", 5, 0.60, VehicleModel.BMC_PROCITY_18M, listOf("m_g1"))
+        val busRoutes = listOf(
+            BusRouteEntity("bus_1", "1", "28 May m/st - Neftçilər m/st", "28 May m/st", "Neftçilər m/st", "06:00 - 23:59", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r3", "m_r9")),
+            BusRouteEntity("bus_2", "2", "B.Avtovağzal - Dərnəgül m/st", "B.Avtovağzal", "Dərnəgül m/st", "05:48 - 23:30", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_g1")),
+            BusRouteEntity("bus_3", "3", "Badamdar qəs. - Dərnəgül m/st", "Badamdar qəs.", "Dərnəgül m/st", "06:00 - 23:30", 12, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_g1")),
+            BusRouteEntity("bus_4", "4", "Ağ Şəhər - Montin", "Ağ Şəhər", "Montin", "06:30 - 22:05", 15, 0.60, VehicleModel.KARSAN_ATAK, emptyList()),
+            BusRouteEntity("bus_5", "5", "Nərimanov m/st - 20-ci Sahə", "Nərimanov m/st", "20-ci Sahə", "05:55 - 23:59", 7, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r5")),
+            BusRouteEntity("bus_6", "6", "20-ci Sahə - Azadlıq m/st", "20-ci Sahə", "Azadlıq m/st", "05:50 - 23:30", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_g2")),
+            BusRouteEntity("bus_7a", "7A", "B.Avtovağzal - Gəncə Pr", "B.Avtovağzal", "Gəncə Pr", "06:00 - 23:30", 9, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_r11")),
+            BusRouteEntity("bus_7b", "7B", "Yeni Yasamal - Koroğlu m/st", "Yeni Yasamal", "Koroğlu m/st", "06:00 - 23:30", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_g6", "m_r7")),
+            BusRouteEntity("bus_10", "10", "Mida - Ağ Şəhər", "Mida", "Ağ Şəhər", "06:00 - 23:00", 15, 0.60, VehicleModel.KARSAN_ATAK, emptyList()),
+            BusRouteEntity("bus_11", "11", "S.Rəhimov küç - Sadıqcan küç", "S.Rəhimov küç", "Sadıqcan küç", "06:00 - 23:30", 12, 0.60, VehicleModel.BMC_PROCITY_12M, emptyList()),
+            BusRouteEntity("bus_13", "13", "B.Avtovağzal - Koroğlu m/st", "B.Avtovağzal", "Koroğlu m/st", "06:00 - 23:30", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_r7")),
+            BusRouteEntity("bus_14", "14", "B.Avtovağzal - 28 May m/st", "B.Avtovağzal", "28 May m/st", "06:00 - 23:30", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_r3")),
+            BusRouteEntity("bus_17", "17", "Yeni Yasamal - Kobia", "Yeni Yasamal", "Kobia", "06:00 - 23:30", 12, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_g6")),
+            BusRouteEntity("bus_21", "21", "Əhmədli m/st - 28 May m/st", "Əhmədli m/st", "28 May m/st", "06:00 - 23:30", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r11", "m_r3")),
+            BusRouteEntity("bus_32", "32", "C.Naxçıvanski küç - 28 May m/st", "C.Naxçıvanski küç", "28 May m/st", "05:45 - 23:30", 12, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r3")),
+            BusRouteEntity("bus_88", "88", "Dərnəgül m/st - 20-ci Sahə", "Dərnəgül m/st", "20-ci Sahə", "06:00 - 23:30", 5, 0.60, VehicleModel.BMC_PROCITY_18M, listOf("m_g1")),
+            BusRouteEntity("bus_h1", "H1", "Hava Limanı - 28 May m/st", "Hava Limanı", "28 May m/st", "06:00 - 01:00", 30, 1.50, VehicleModel.NEOPLAN_TOURLINER, listOf("m_r3"))
         )
 
         transitDao.insertStops(stops)
-        transitDao.insertBusRoutes(routes)
+        transitDao.insertBusRoutes(busRoutes)
     }
 }

@@ -1,12 +1,21 @@
 package com.zaur1.bakutransit.ui.viewmodel
 
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.os.Looper
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.location.*
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.zaur1.bakutransit.data.local.BusRouteEntity
+import com.zaur1.bakutransit.BuildConfig
 import com.zaur1.bakutransit.data.local.TransitStopEntity
 import com.zaur1.bakutransit.data.model.LatLng
 import com.zaur1.bakutransit.data.model.TransportType
@@ -17,15 +26,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.File
 import kotlin.math.*
 
-/**
- * HIGH-PERFORMANCE VIEWMODEL for Baku Transit.
- * Features: Continuous GPS, GraphHopper Routing, and OTA Update Checks.
- */
 class TransitViewModel(private val repository: TransitRepository) : ViewModel() {
 
-    // --- STATE ---
     private val _userLocation = MutableStateFlow<LatLng?>(null)
     val userLocation = _userLocation.asStateFlow()
 
@@ -41,11 +46,12 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private val _routePoints = MutableStateFlow<List<LatLng>>(emptyList())
     val routePoints = _routePoints.asStateFlow()
 
-    // OTA State
-    private val _newVersionAvailable = MutableStateFlow<String?>(null)
-    val newVersionAvailable = _newVersionAvailable.asStateFlow()
+    private val _newVersion = MutableStateFlow<String?>(null)
+    val newVersionAvailable = _newVersion.asStateFlow()
 
-    // --- DATA ---
+    private val _isDownloading = MutableStateFlow(false)
+    val isDownloading = _isDownloading.asStateFlow()
+
     val allBusRoutes = repository.allBusRoutes.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val allStops = repository.allStops.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -58,11 +64,11 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch { 
             repository.prePopulateData()
             checkForUpdates()
         }
-
+        
         viewModelScope.launch {
             combine(userLocation, destination, allStops) { loc, dest, stops ->
                 val target = dest ?: loc?.let { l ->
@@ -78,39 +84,71 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     }
 
     // --- OTA UPDATE CHECK ---
-    private fun checkForUpdates() {
+    fun checkForUpdates() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val client = OkHttpClient()
-                    // URL pointing to the latest release on your GitHub
                     val url = "https://api.github.com/repos/Zaur1zaur2/BakuTransit/releases/latest"
-                    val request = Request.Builder().url(url).build()
-                    val response = client.newCall(request).execute()
-                    val body = response.body?.string()
-                    
+                    val body = OkHttpClient().newCall(Request.Builder().url(url).build()).execute().body?.string()
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
-                        val latestTag = json.get("tag_name").asString // e.g., "v1.2.0"
-                        val currentTag = "v1.1.1" // Current version
-                        
-                        if (latestTag != currentTag) {
-                            _newVersionAvailable.value = latestTag
-                        }
+                        val latestTag = json.get("tag_name").asString
+                        if (latestTag != "v1.1.2") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
             }
         }
     }
 
-    // --- GPS ---
+    fun downloadAndInstallApk(context: Context) {
+        _isDownloading.value = true
+        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "BakuTransit_Update.apk")
+        if (destinationFile.exists()) destinationFile.delete()
+
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.2.apk"))
+            .setTitle("Baku Transit Yeniləmə")
+            .setDescription("Yeni versiya yüklənir...")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationUri(Uri.fromFile(destinationFile))
+
+        val downloadId = downloadManager.enqueue(request)
+
+        val onComplete = object : BroadcastReceiver() {
+            override fun onReceive(ctxt: Context, intent: Intent) {
+                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                if (id == downloadId) {
+                    _isDownloading.value = false
+                    promptInstall(ctxt, destinationFile)
+                    context.unregisterReceiver(this)
+                }
+            }
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
+        } else {
+            context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        }
+    }
+
+    private fun promptInstall(context: Context, file: File) {
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        context.startActivity(installIntent)
+    }
+
+    // --- GPS & ROUTING ---
     private var fusedClient: FusedLocationProviderClient? = null
     private var locCallback: LocationCallback? = null
 
     fun startLocationUpdates(client: FusedLocationProviderClient) {
         if (locCallback != null) return
         fusedClient = client
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 2000).build()
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1500).build()
         locCallback = object : LocationCallback() {
             override fun onLocationResult(res: LocationResult) {
                 res.lastLocation?.let { _userLocation.value = LatLng(it.latitude, it.longitude) }
@@ -122,27 +160,14 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun setDestination(latLng: LatLng?) { _destination.value = latLng }
 
-    /**
-     * Finds the closest stop with an increased touch radius (0.5km) for easier tapping.
-     * Prioritizes Metro stations.
-     */
     fun findStopAt(lat: Double, lng: Double, radiusKm: Double = 0.5): TransitStopEntity? {
         val clickLoc = LatLng(lat, lng)
-        val candidates = allStops.value.filter { 
-            calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) <= radiusKm 
-        }
-        
+        val candidates = allStops.value.filter { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) <= radiusKm }
         if (candidates.isEmpty()) return null
-        
-        // Priority: Metro
-        val metro = candidates.filter { it.type == TransportType.METRO }
-            .minByOrNull { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) }
-        if (metro != null) return metro
-        
-        return candidates.minByOrNull { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) }
+        return candidates.filter { it.type == TransportType.METRO }.minByOrNull { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) }
+            ?: candidates.minByOrNull { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) }
     }
 
-    // --- ROUTING ---
     private fun executeRouting(o: LatLng, d: LatLng) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -157,19 +182,21 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     private fun fetchGH(o: LatLng, d: LatLng, p: String): Pair<List<LatLng>, String?> {
         return try {
-            val key = "e82b32df-fcd5-4dc6-88e9-536ed3e2e4db"
+            val key = BuildConfig.GRAPHHOPPER_API_KEY
             val url = "https://graphhopper.com/api/1/route?point=${o.latitude},${o.longitude}&point=${d.latitude},${d.longitude}&profile=$p&points_encoded=false&key=$key"
             val body = OkHttpClient().newCall(Request.Builder().url(url).build()).execute().body?.string() ?: return emptyList<LatLng>() to null
             val json = Gson().fromJson(body, JsonObject::class.java)
             val path = json.getAsJsonArray("paths")?.get(0)?.asJsonObject ?: return emptyList<LatLng>() to null
             val dist = path.get("distance").asDouble / 1000.0
             val time = path.get("time").asLong / 60000
-            val pts = path.getAsJsonObject("points").getAsJsonArray("coordinates").map { LatLng(it.asJsonArray[1].asDouble, it.asJsonArray[0].asDouble) }
-            pts to "%.2f km | %d dəq".format(dist, time)
+            ptsToPair(path) to "%.2f km | %d dəq".format(dist, time)
         } catch (e: Exception) { emptyList<LatLng>() to null }
     }
 
-    // --- UTILS ---
+    private fun ptsToPair(path: JsonObject): List<LatLng> {
+        return path.getAsJsonObject("points").getAsJsonArray("coordinates").map { LatLng(it.asJsonArray[1].asDouble, it.asJsonArray[0].asDouble) }
+    }
+
     fun normalizeAze(t: String) = t.lowercase().replace("i̇", "i").replace("ə", "e").replace("ı", "i").replace("ö", "o").replace("ü", "u").replace("ş", "s").replace("ç", "c").replace("ğ", "g").replace(" ", "")
 
     fun calculateDistance(l1: LatLng, l2: LatLng): Double {
@@ -177,7 +204,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         val dLat = Math.toRadians(l2.latitude - l1.latitude)
         val dLon = Math.toRadians(l2.longitude - l1.longitude)
         val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(l1.latitude)) * cos(Math.toRadians(l2.latitude)) * sin(dLon/2) * sin(dLon/2)
-        return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
+        return r * 2.0 * atan2(sqrt(a), sqrt(1 - a))
     }
 
     override fun onCleared() {

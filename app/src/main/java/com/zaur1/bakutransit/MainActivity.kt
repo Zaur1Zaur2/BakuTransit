@@ -7,12 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.maptiler.maptilersdk.MTConfig
@@ -21,11 +23,8 @@ import com.zaur1.bakutransit.ui.theme.BakuTransitTheme
 import com.zaur1.bakutransit.ui.viewmodel.SettingsViewModel
 import com.zaur1.bakutransit.ui.viewmodel.TransitViewModel
 import com.zaur1.bakutransit.ui.viewmodel.TransitViewModelFactory
+import kotlinx.coroutines.delay
 
-/**
- * Entry point Activity.
- * Implements Android 12+ Splash Screen API and Edge-to-Edge visuals.
- */
 class MainActivity : AppCompatActivity() {
     
     private val transitViewModel: TransitViewModel by viewModels {
@@ -36,11 +35,9 @@ class MainActivity : AppCompatActivity() {
     private var isMapReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Initialize Splash Screen (critical to call before super.onCreate)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         
-        // 2. Window Visuals: Full Screen & Translucent Bars
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar?.hide()
         enableEdgeToEdge()
@@ -48,25 +45,39 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = AndroidColor.TRANSPARENT
         window.navigationBarColor = AndroidColor.TRANSPARENT
 
-        // 3. Keep splash screen on until map informs us it's ready
         splashScreen.setKeepOnScreenCondition { !isMapReady }
-
-        // 4. MapTiler Initialization
         MTConfig.apiKey = BuildConfig.MAPTILER_API_KEY
 
         setContent {
             val isDarkMode by settingsViewModel.isDarkMode.collectAsState()
-            
+            val recreateCount by settingsViewModel.recreateTrigger.collectAsState()
+            var isChangingLanguage by remember { mutableStateOf(false) }
+
+            // Handle language change with loading
+            LaunchedEffect(recreateCount) {
+                if (recreateCount > 0) {
+                    isChangingLanguage = true
+                    delay(800) // Show loading for smooth transition
+                    recreate()
+                }
+            }
+
             BakuTransitTheme(darkTheme = isDarkMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(
-                        transitViewModel = transitViewModel, 
-                        settingsViewModel = settingsViewModel,
-                        onMapReady = { isMapReady = true } // Release splash screen
-                    )
+                    if (isChangingLanguage) {
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        MainScreen(
+                            transitViewModel = transitViewModel, 
+                            settingsViewModel = settingsViewModel,
+                            onMapReady = { isMapReady = true }
+                        )
+                    }
                 }
             }
         }
