@@ -93,8 +93,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        // Update to match current version
-                        if (latestTag != "v1.1.4") _newVersion.value = latestTag
+                        if (latestTag != "v1.1.5") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
             }
@@ -103,11 +102,11 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun downloadAndInstallApk(context: Context) {
         _isDownloading.value = true
-        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.4.apk")
+        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.5.apk")
         if (destinationFile.exists()) destinationFile.delete()
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.4.apk"))
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.5.apk"))
             .setTitle("Baku Transit")
             .setDescription("Yenilənmə yüklənir...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -162,7 +161,10 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun setDestination(latLng: LatLng?) { _destination.value = latLng }
 
-    fun findStopAt(lat: Double, lng: Double, radiusKm: Double = 0.5): TransitStopEntity? {
+    /**
+     * Touch radius increased to 0.75km for easier tapping on Note 3 screen.
+     */
+    fun findStopAt(lat: Double, lng: Double, radiusKm: Double = 0.75): TransitStopEntity? {
         val clickLoc = LatLng(lat, lng)
         val candidates = allStops.value.filter { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) <= radiusKm }
         if (candidates.isEmpty()) return null
@@ -173,7 +175,6 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private fun executeRouting(o: LatLng, d: LatLng) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                // Ensure profile=foot for walking
                 val foot = fetchGH(o, d, "foot")
                 _routePoints.value = foot.first
                 _footInfo.value = foot.second
@@ -208,19 +209,6 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         val dLon = Math.toRadians(l2.longitude - l1.longitude)
         val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(l1.latitude)) * cos(Math.toRadians(l2.latitude)) * sin(dLon/2) * sin(dLon/2)
         return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
-    }
-
-    fun updateLocale(context: Context, lang: String) {
-        val locale = when(lang) {
-            "ENG" -> Locale.ENGLISH
-            "RUS" -> Locale("ru")
-            else -> Locale("az")
-        }
-        Locale.setDefault(locale)
-        val config = context.resources.configuration
-        config.setLocale(locale)
-        context.createConfigurationContext(config)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 
     override fun onCleared() {

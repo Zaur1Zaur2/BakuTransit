@@ -14,7 +14,7 @@ class TransitRepository(private val transitDao: TransitDao) {
     val allStops: Flow<List<TransitStopEntity>> = transitDao.getAllStops()
 
     suspend fun prePopulateData() {
-        // ALWAYS update bus routes to ensure all are present
+        // Update both every time to ensure data consistency
         val busRoutes = listOf(
             BusRouteEntity("bus_1", "1", "28 May m/st - Neftçilər m/st", "28 May m/st", "Neftçilər m/st", "06:00 - 23:59", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r3", "m_r9")),
             BusRouteEntity("bus_2", "2", "B.Avtovağzal - Dərnəgül m/st", "B.Avtovağzal", "Dərnəgül m/st", "05:48 - 23:30", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_g1")),
@@ -66,10 +66,9 @@ class TransitRepository(private val transitDao: TransitDao) {
             BusRouteEntity("bus_594", "594", "Sumqayıt - 20 Yanvar m/st", "Sumqayıt", "20 Yanvar m/st", "05:50 - 23:00", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_g5")),
             BusRouteEntity("bus_595", "595", "S.Avtovağzal - B.Avtovağzal", "S.Avtovağzal", "B.Avtovağzal", "06:00 - 22:30", 12, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2")),
             BusRouteEntity("bus_e1", "E1", "Xalqlar m/st - Abşeron t/m", "Xalqlar m/st", "Abşeron t/m", "06:00 - 19:00", 10, 0.60, VehicleModel.BMC_PROCITY_18M, listOf("m_r10")),
-            BusRouteEntity("bus_h1", "H1", "Hava Limanı - 28 May m/st", "Hava Limanı", "28 May m/st", "06:00 - 01:00", 30, 1.50, VehicleModel.NEOPLAN_TOURLINER, listOf("m_r3")),
+            BusRouteEntity("bus_h1", "H1", "Hava Limanı - 28 May m/st", "Hava Limanı", "28 May m/st", "06:00 - 01:00", 30, 1.50, VehicleModel.NEOPLAN_TOURLINER, listOf("hub_airport", "m_r3")),
             BusRouteEntity("bus_m8", "M8", "Maştağa qəs - Gənclik m/st", "Maştağa qəs", "Gənclik m/st", "05:40 - 22:15", 20, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r4"))
         )
-        
         transitDao.insertBusRoutes(busRoutes)
 
         if (allStops.first().isEmpty()) {
@@ -102,7 +101,8 @@ class TransitRepository(private val transitDao: TransitDao) {
                 TransitStopEntity("m_p3", "8 Noyabr", TransportType.METRO, 40.4051, 49.8212, listOf("metro_purple")),
                 TransitStopEntity("bus_s1", "Bakı Bulvarı", TransportType.BUS, 40.3700, 49.8500, emptyList()),
                 TransitStopEntity("bus_s2", "Fəvvarələr Meydanı", TransportType.BUS, 40.3708, 49.8369, emptyList()),
-                TransitStopEntity("bus_s3", "Port Baku", TransportType.BUS, 40.3758, 49.8650, emptyList())
+                TransitStopEntity("bus_s3", "Port Baku", TransportType.BUS, 40.3758, 49.8650, emptyList()),
+                TransitStopEntity("hub_airport", "Hava Limanı", TransportType.TRAIN, 40.4631, 50.0461, emptyList())
             )
             transitDao.insertStops(stops)
         }

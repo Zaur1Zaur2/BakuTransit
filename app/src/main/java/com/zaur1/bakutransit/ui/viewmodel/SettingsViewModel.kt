@@ -12,9 +12,9 @@ class SettingsViewModel : ViewModel() {
     private val _language = MutableStateFlow("AZE")
     val language: StateFlow<String> = _language.asStateFlow()
     
-    // Trigger to reload activity
-    private val _recreateTrigger = MutableStateFlow(0)
-    val recreateTrigger: StateFlow<Int> = _recreateTrigger.asStateFlow()
+    // Use a simpler boolean flag for language change to prevent "twitching"
+    private val _shouldRecreate = MutableStateFlow(false)
+    val shouldRecreate = _shouldRecreate.asStateFlow()
 
     fun toggleDarkMode() {
         _isDarkMode.value = !_isDarkMode.value
@@ -23,7 +23,11 @@ class SettingsViewModel : ViewModel() {
     fun setLanguage(lang: String) {
         if (_language.value != lang) {
             _language.value = lang
-            _recreateTrigger.value += 1
+            _shouldRecreate.value = true
         }
+    }
+
+    fun onRecreated() {
+        _shouldRecreate.value = false
     }
 }

@@ -81,13 +81,30 @@ fun TransitListScreen(viewModel: TransitViewModel) {
 @Composable
 fun GeneralGuidelines() {
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item { Text("Bakı Nəqliyyat Qaydaları", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text("Sərnişin daşınması və BakıKart haqqında.", style = MaterialTheme.typography.bodyMedium) }
+        item { 
+            Text("Bakı Nəqliyyat Qaydaları", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("Sərnişin daşınması və BakıKart haqqında ümumi məlumatlar.", style = MaterialTheme.typography.bodyMedium) 
+        }
         item {
             Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("🚇 Metro Sistemi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp))
-                    Text("• Ödəniş yalnız BakıKart və ya QR ilə.", style = MaterialTheme.typography.bodySmall)
-                    Text("• Gediş haqqı: 0.60 AZN.", style = MaterialTheme.typography.bodySmall)
+                    Text("🚇 Metropoliten Qaydaları", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(10.dp))
+                    Text("1. Ödəniş yalnız BakıKart (plastik və ya QR) ilədir.", style = MaterialTheme.typography.bodySmall)
+                    Text("2. Gediş haqqı: 0.60 AZN.", style = MaterialTheme.typography.bodySmall)
+                    Text("3. İş saatları: 06:00 - 00:00.", style = MaterialTheme.typography.bodySmall)
+                    Text("4. Stansiyalarda siqaret çəkmək qadağandır.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+        item {
+            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("🚌 Avtobus Qaydaları", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(10.dp))
+                    Text("1. Avtobusa ön qapıdan minib, orta/arxa qapıdan düşmək lazımdır.", style = MaterialTheme.typography.bodySmall)
+                    Text("2. Ödəniş sürücüyə yox, BakıKart oxuyucuya edilir.", style = MaterialTheme.typography.bodySmall)
+                    Text("3. Yaşlılara və ehtiyacı olanlara yer vermək tövsiyə olunur.", style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

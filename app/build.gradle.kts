@@ -14,9 +14,9 @@ android {
 
     defaultConfig {
         applicationId = "com.zaur1.bakutransit"
-        minSdk = 28
-        targetSdk = 30
-        versionCode = 5
+        minSdk = 26
+        targetSdk = 34
+        versionCode = 7
         versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -46,7 +46,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             
