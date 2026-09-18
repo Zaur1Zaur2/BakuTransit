@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
+import java.util.Locale
 import kotlin.math.*
 
 class TransitViewModel(private val repository: TransitRepository) : ViewModel() {
@@ -92,7 +93,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        // Match with the current hardcoded version in VM for comparison
+                        // FIX: Ensure comparison with current version
                         if (latestTag != "v1.1.4") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
@@ -211,6 +212,19 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         val dLon = Math.toRadians(l2.longitude - l1.longitude)
         val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(l1.latitude)) * cos(Math.toRadians(l2.latitude)) * sin(dLon/2) * sin(dLon/2)
         return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
+    }
+
+    fun updateLocale(context: Context, lang: String) {
+        val locale = when(lang) {
+            "ENG" -> Locale.ENGLISH
+            "RUS" -> Locale("ru")
+            else -> Locale("az")
+        }
+        Locale.setDefault(locale)
+        val config = context.resources.configuration
+        config.setLocale(locale)
+        context.createConfigurationContext(config)
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 
     override fun onCleared() {

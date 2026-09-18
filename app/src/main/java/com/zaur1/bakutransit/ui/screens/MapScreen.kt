@@ -1,10 +1,8 @@
 package com.zaur1.bakutransit.ui.screens
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -49,15 +47,9 @@ import com.maptiler.maptilersdk.events.MTEvent
 import com.maptiler.maptilersdk.map.MTMapViewDelegate
 import com.maptiler.maptilersdk.map.types.MTData
 
-/**
- * HIGH-PERFORMANCE COORDINATE-BASED MAP SCREEN
- * Includes 4. SOS Button and Optimized 3,5. Tourist/Price logic connection.
- */
 @Composable
 fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
     val context = LocalContext.current
-    
-    // STATE
     val stops by viewModel.allStops.collectAsState()
     val userLoc by viewModel.userLocation.collectAsState()
     val nearestS by viewModel.nearestStop.collectAsState()
@@ -65,7 +57,6 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
     val fInfo by viewModel.footInfo.collectAsState()
     val cInfo by viewModel.carInfo.collectAsState()
 
-    // UI
     var query by remember { mutableStateOf("") }
     var sOpen by remember { mutableStateOf(false) }
     var activePopup by remember { mutableStateOf<TransitStopEntity?>(null) }
@@ -75,11 +66,9 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
     val controller = remember { MTMapViewController(context) }
     val mStore = remember { mutableMapOf<String, MTMarker>() }
     var meM by remember { mutableStateOf<MTMarker?>(null) }
-    var linesDone by remember { mutableStateOf(false) }
 
-    // THE FIX: COORDINATE HIT-TESTING
-    val curNear = rememberUpdatedState(nearestS)
     val curStops = rememberUpdatedState(stops)
+    val curNear = rememberUpdatedState(nearestS)
 
     val delegate = remember {
         object : MTMapViewDelegate {
@@ -88,6 +77,7 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
                 if (event == MTEvent.ON_TAP) {
                     val lat = data?.coordinate?.lat
                     val lng = data?.coordinate?.lng
+                    
                     if (lat != null && lng != null) {
                         val id = data.id
                         if (id == "user_location") {
@@ -109,16 +99,15 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
 
     LaunchedEffect(controller) { controller.delegate = delegate }
 
-    // RENDER MARKERS
     LaunchedEffect(stops, mInit, sMode) {
         if (mInit && !sMode) {
             controller.style?.let { style ->
                 val ids = stops.map { it.id }.toSet()
-                mStore.keys.filter { it !in ids }.toList().forEach { id -> mStore[id]?.let { m -> style.removeMarker(m) }; mStore.remove(id) }
+                mStore.keys.filter { it !in ids }.forEach { mStore[it]?.let { m -> style.removeMarker(m) }; mStore.remove(it) }
                 stops.forEach { s ->
                     if (s.id !in mStore) {
                         val m = MTMarker(s.id, LngLat(s.longitude, s.latitude))
-                        m.color = if (s.type == TransportType.METRO) Color.RED else Color.BLUE
+                        m.color = if(s.type == TransportType.METRO) Color.RED else Color.BLUE
                         style.addMarker(m); mStore[s.id] = m
                     }
                 }
@@ -127,17 +116,16 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
         }
     }
 
-    // RENDER PATH (Sarı/Gold yol fiks edildi)
     LaunchedEffect(rPoints, mInit) {
         if (mInit && rPoints.isNotEmpty()) {
             controller.style?.let { style ->
                 val h = style.polylineHelper()
+                // Force clear previous paths if possible or just rely on layer management
                 h.addPolyline(MTPolylineLayerOptions(data = geoJson(rPoints), lineColor = "#FFD700", lineWidth = 6.0))
             }
         }
     }
 
-    // ME DOT
     LaunchedEffect(userLoc, mInit) {
         if (mInit && userLoc != null) {
             controller.style?.let { style ->
@@ -148,11 +136,18 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
         }
     }
 
+    val pL = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { p ->
+        if (p.values.all { it }) viewModel.startLocationUpdates(LocationServices.getFusedLocationProviderClient(context))
+    }
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) viewModel.startLocationUpdates(LocationServices.getFusedLocationProviderClient(context))
+        else pL.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
     Box(Modifier.fillMaxSize()) {
-        if (!sMode) MTMapView(referenceStyle = MTMapReferenceStyle.STREETS, options = remember { MTMapOptions(center = LngLat(49.8671, 40.4093), zoom = 11.2) }, controller = controller, modifier = Modifier.fillMaxSize())
+        if (!sMode) MTMapView(referenceStyle = MTMapReferenceStyle.STREETS, options = remember { MTMapOptions(center = LngLat(49.8671, 40.4093), zoom = 11.0) }, controller = controller, modifier = Modifier.fillMaxSize())
         else AsyncImage(model = StopImageProvider.getStaticMapUrl(40.4093, 49.8671), contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         
-        // SEARCH
         Box(Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(16.dp).width(if (sOpen) 300.dp else 56.dp)) {
             if (sOpen) {
                 Column {
@@ -176,26 +171,11 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
             } else FloatingActionButton(onClick = { sOpen = true }, containerColor = MaterialTheme.colorScheme.surface) { Icon(Icons.Default.Search, null) }
         }
 
-        // TOOLBAR (Buttons)
         Column(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             FloatingActionButton(onClick = { sMode = !sMode }, containerColor = if (sMode) ComposeColor.Red else MaterialTheme.colorScheme.tertiaryContainer) { Icon(Icons.Default.Refresh, null) }
             FloatingActionButton(onClick = { userLoc?.let { controller.setCenter(LngLat(it.longitude, it.latitude)); controller.setZoom(15.5) } }, containerColor = MaterialTheme.colorScheme.secondaryContainer) { Icon(Icons.Default.LocationOn, null) }
-            
-            // 4. SOS BUTTON (Safety)
-            FloatingActionButton(
-                onClick = { 
-                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:112"))
-                    context.startActivity(intent)
-                },
-                containerColor = ComposeColor.Red,
-                contentColor = ComposeColor.White,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Text("SOS", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-            }
         }
 
-        // BOTTOM PANEL
         Card(Modifier.align(Alignment.BottomCenter).padding(16.dp).fillMaxWidth(), colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface.copy(0.95f))) {
             Column(Modifier.padding(16.dp)) {
                 Row { LegendItem(ComposeColor.Red, "Metro"); Spacer(Modifier.width(16.dp)); LegendItem(ComposeColor(0xFFFFD700), "Marşrut") }

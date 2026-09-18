@@ -106,7 +106,7 @@ fun MainScreen(
             // OTA Dialog
             newVersion?.let { version ->
                 AlertDialog(
-                    onDismissRequest = { /* Keep it visible */ },
+                    onDismissRequest = { transitViewModel.dismissUpdateDialog() },
                     title = { Text("Yeni Yenilənmə Mövcuddur!") },
                     text = { Text("Tətbiqin yeni versiyası ($version) hazırdır. İndi yükləyib quraşdıraq?") },
                     confirmButton = {
@@ -186,7 +186,7 @@ fun SettingsAndInfoScreen(settingsViewModel: SettingsViewModel, transitViewModel
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(stringResource(R.string.legal_info), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("${stringResource(R.string.version_label)}: 1.1.3", style = MaterialTheme.typography.bodyMedium)
+                    Text("${stringResource(R.string.version_label)}: 1.1.4", style = MaterialTheme.typography.bodyMedium)
                     Text("${stringResource(R.string.support_label)}: support@bakutransit.live", style = MaterialTheme.typography.bodyMedium)
                     
                     Spacer(modifier = Modifier.height(16.dp))
