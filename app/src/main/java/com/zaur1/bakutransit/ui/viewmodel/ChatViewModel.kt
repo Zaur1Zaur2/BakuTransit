@@ -31,7 +31,7 @@ class ChatViewModel : ViewModel() {
     )
 
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-2.0-flash", // Upgraded from 1.5 to 2.0 Flash
+        modelName = "gemini-2.0-flash", // Using current stable flash
         apiKey = BuildConfig.GEMINI_API_KEY,
         safetySettings = safetySettings,
         systemInstruction = content {

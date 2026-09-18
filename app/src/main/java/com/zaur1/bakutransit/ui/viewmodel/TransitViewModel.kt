@@ -96,7 +96,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        if (latestTag != "v1.1.4") {
+                        if (latestTag != "v1.1.5") {
                             _newVersion.value = latestTag
                         } else if (manual) {
                             _updateCheckMessage.value = "Tətbiq artıq ən son versiyadadır."
@@ -119,11 +119,11 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun downloadAndInstallApk(context: Context) {
         _isDownloading.value = true
-        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.4.apk")
+        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.5.apk")
         if (destinationFile.exists()) destinationFile.delete()
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.4.apk"))
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.5.apk"))
             .setTitle("Baku Transit")
             .setDescription("Yenilənmə yüklənir...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
