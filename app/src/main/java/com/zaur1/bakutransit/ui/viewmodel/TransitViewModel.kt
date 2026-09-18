@@ -50,6 +50,9 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private val _newVersion = MutableStateFlow<String?>(null)
     val newVersionAvailable = _newVersion.asStateFlow()
 
+    private val _updateCheckMessage = MutableStateFlow<String?>(null)
+    val updateCheckMessage = _updateCheckMessage.asStateFlow()
+
     private val _isDownloading = MutableStateFlow(false)
     val isDownloading = _isDownloading.asStateFlow()
 
@@ -84,7 +87,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         }
     }
 
-    fun checkForUpdates() {
+    fun checkForUpdates(manual: Boolean = false) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -93,12 +96,21 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        // FIX: Ensure comparison with current version
-                        if (latestTag != "v1.1.4") _newVersion.value = latestTag
+                        if (latestTag != "v1.1.4") {
+                            _newVersion.value = latestTag
+                        } else if (manual) {
+                            _updateCheckMessage.value = "Tətbiq artıq ən son versiyadadır."
+                        }
                     }
-                } catch (e: Exception) { e.printStackTrace() }
+                } catch (e: Exception) { 
+                    if (manual) _updateCheckMessage.value = "Yenilənmə yoxlanarkən xəta baş verdi."
+                }
             }
         }
+    }
+
+    fun clearUpdateMessage() {
+        _updateCheckMessage.value = null
     }
 
     fun dismissUpdateDialog() {
@@ -152,16 +164,27 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private var locCallback: LocationCallback? = null
 
     fun startLocationUpdates(client: FusedLocationProviderClient) {
-        if (locCallback != null) return
+        // ALWAYS update the client and restart if necessary to ensure it's not "broken"
+        fusedClient?.removeLocationUpdates(locCallback ?: object : LocationCallback() {})
+        
         fusedClient = client
-        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1500).build()
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            .setMinUpdateIntervalMillis(500)
+            .build()
+            
         locCallback = object : LocationCallback() {
             override fun onLocationResult(res: LocationResult) {
-                res.lastLocation?.let { _userLocation.value = LatLng(it.latitude, it.longitude) }
+                res.lastLocation?.let { 
+                    _userLocation.value = LatLng(it.latitude, it.longitude) 
+                }
             }
         }
-        try { fusedClient?.requestLocationUpdates(request, locCallback!!, Looper.getMainLooper()) }
-        catch (e: SecurityException) { e.printStackTrace() }
+        
+        try { 
+            fusedClient?.requestLocationUpdates(request, locCallback!!, Looper.getMainLooper()) 
+        } catch (e: SecurityException) { 
+            e.printStackTrace() 
+        }
     }
 
     fun setDestination(latLng: LatLng?) { _destination.value = latLng }
@@ -189,7 +212,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     private fun fetchGH(o: LatLng, d: LatLng, p: String): Pair<List<LatLng>, String?> {
         return try {
-            val key = BuildConfig.GRAPHHOPPER_API_KEY
+            val key = "e82b32df-fcd5-4dc6-88e9-536ed3e2e4db"
             val url = "https://graphhopper.com/api/1/route?point=${o.latitude},${o.longitude}&point=${d.latitude},${d.longitude}&profile=$p&points_encoded=false&key=$key"
             val body = OkHttpClient().newCall(Request.Builder().url(url).build()).execute().body?.string() ?: return emptyList<LatLng>() to null
             val json = Gson().fromJson(body, JsonObject::class.java)
@@ -212,19 +235,6 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
         val dLon = Math.toRadians(l2.longitude - l1.longitude)
         val a = sin(dLat/2) * sin(dLat/2) + cos(Math.toRadians(l1.latitude)) * cos(Math.toRadians(l2.latitude)) * sin(dLon/2) * sin(dLon/2)
         return r * 2.0 * atan2(sqrt(a), sqrt(1.0 - a))
-    }
-
-    fun updateLocale(context: Context, lang: String) {
-        val locale = when(lang) {
-            "ENG" -> Locale.ENGLISH
-            "RUS" -> Locale("ru")
-            else -> Locale("az")
-        }
-        Locale.setDefault(locale)
-        val config = context.resources.configuration
-        config.setLocale(locale)
-        context.createConfigurationContext(config)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
     }
 
     override fun onCleared() {

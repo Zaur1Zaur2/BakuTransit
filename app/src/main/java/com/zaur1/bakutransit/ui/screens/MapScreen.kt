@@ -103,7 +103,10 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
         if (mInit && !sMode) {
             controller.style?.let { style ->
                 val ids = stops.map { it.id }.toSet()
-                mStore.keys.filter { it !in ids }.forEach { mStore[it]?.let { m -> style.removeMarker(m) }; mStore.remove(it) }
+                mStore.keys.filter { it !in ids }.toList().forEach { id -> 
+                    mStore[id]?.let { m -> style.removeMarker(m) }
+                    mStore.remove(id) 
+                }
                 stops.forEach { s ->
                     if (s.id !in mStore) {
                         val m = MTMarker(s.id, LngLat(s.longitude, s.latitude))
@@ -120,18 +123,21 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
         if (mInit && rPoints.isNotEmpty()) {
             controller.style?.let { style ->
                 val h = style.polylineHelper()
-                // Force clear previous paths if possible or just rely on layer management
                 h.addPolyline(MTPolylineLayerOptions(data = geoJson(rPoints), lineColor = "#FFD700", lineWidth = 6.0))
             }
         }
     }
 
+    // ROBUST ME DOT UPDATE
     LaunchedEffect(userLoc, mInit) {
         if (mInit && userLoc != null) {
             controller.style?.let { style ->
+                // Use a stable identifier or update position if SDK supports it
                 meM?.let { style.removeMarker(it) }
                 val m = MTMarker("user_location", LngLat(userLoc!!.longitude, userLoc!!.latitude))
-                m.color = Color.CYAN; style.addMarker(m); meM = m
+                m.color = Color.CYAN
+                style.addMarker(m)
+                meM = m
             }
         }
     }
@@ -140,8 +146,9 @@ fun MapScreen(viewModel: TransitViewModel, onMapReady: () -> Unit = {}) {
         if (p.values.all { it }) viewModel.startLocationUpdates(LocationServices.getFusedLocationProviderClient(context))
     }
     LaunchedEffect(Unit) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) viewModel.startLocationUpdates(LocationServices.getFusedLocationProviderClient(context))
-        else pL.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            viewModel.startLocationUpdates(LocationServices.getFusedLocationProviderClient(context))
+        } else pL.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
     }
 
     Box(Modifier.fillMaxSize()) {

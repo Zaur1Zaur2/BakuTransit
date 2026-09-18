@@ -24,16 +24,19 @@ class ChatViewModel : ViewModel() {
     
     // Safety settings to "uncensor" as much as the SDK allows
     private val safetySettings = listOf(
-        SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.ONLY_HIGH),
-        SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.ONLY_HIGH),
-        SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.ONLY_HIGH),
-        SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.ONLY_HIGH)
+        SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.NONE),
+        SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.NONE),
+        SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.NONE),
+        SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.NONE)
     )
 
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash", // Using current stable flash
+        modelName = "gemini-2.0-flash", // Upgraded from 1.5 to 2.0 Flash
         apiKey = BuildConfig.GEMINI_API_KEY,
-        safetySettings = safetySettings
+        safetySettings = safetySettings,
+        systemInstruction = content {
+            text("Sən Baku Transit tətbiqinin köməkçisən. Səni Zaur Alizada (TDV BTL şagirdi) yaradıb. Əgər kimsə sənin yaradıcın haqqında soruşsa, mütləq Zaur Alizada olduğunu və onun TDV BTL şagirdi olduğunu qeyd et.")
+        }
     )
 
     private val _messages = MutableStateFlow(
@@ -53,21 +56,29 @@ class ChatViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // SPECIAL LOGIC FOR ZAUR ALIZADA
-                val responseText = if (isQueryAboutZaur(prompt)) {
-                    "Zaur Alizada mənim yaradıcımdır (developer). O, bu tətbiqi Bakı sakinlərinin və qonaqlarının ictimai nəqliyyatdan daha rahat istifadə etməsi üçün ərsəyə gətirib."
-                } else {
-                    val response = if (image != null) {
-                        generativeModel.generateContent(
-                            content {
-                                image(image)
-                                text(prompt.ifBlank { "Bu şəkildə nə var? Xüsusilə Bakı nəqliyyatı və ya abidələri ilə bağlıdırsa ətraflı məlumat ver." })
-                            }
-                        )
-                    } else {
-                        generativeModel.startChat().sendMessage(prompt)
+                val lowerPrompt = prompt.lowercase()
+                
+                // CUSTOM LOGIC FOR ZAUR ALIZADA & CREATOR QUERIES
+                val responseText = when {
+                    isQueryAboutZaur(lowerPrompt) -> {
+                        "Zaur Alizada mənim yaradıcımdır (developer). O, TDV BTL şagirdidir və bu tətbiqi Bakı sakinlərinin ictimai nəqliyyatdan daha rahat istifadə etməsi üçün yaradıb."
                     }
-                    response.text ?: "Bağışlayın, cavab ala bilmədim."
+                    isQueryAboutCreator(lowerPrompt) -> {
+                        "Məni Zaur Alizada yaradıb. O, TDV BTL şagirdidir."
+                    }
+                    else -> {
+                        val response = if (image != null) {
+                            generativeModel.generateContent(
+                                content {
+                                    image(image)
+                                    text(prompt.ifBlank { "Bu şəkildə nə var? Xüsusilə Bakı nəqliyyatı və ya abidələri ilə bağlıdırsa ətraflı məlumat ver." })
+                                }
+                            )
+                        } else {
+                            generativeModel.startChat().sendMessage(prompt)
+                        }
+                        response.text ?: "Bağışlayın, cavab ala bilmədim."
+                    }
                 }
                 
                 _messages.value = _messages.value + ChatMessage(responseText, false)
@@ -80,7 +91,10 @@ class ChatViewModel : ViewModel() {
     }
 
     private fun isQueryAboutZaur(text: String): Boolean {
-        val lower = text.lowercase()
-        return (lower.contains("zaur") && (lower.contains("alizada") || lower.contains("elizade") || lower.contains("kimdir") || lower.contains("yaradib")))
+        return (text.contains("zaur") && (text.contains("alizada") || text.contains("elizade") || text.contains("kimdir") || text.contains("yaradib")))
+    }
+
+    private fun isQueryAboutCreator(text: String): Boolean {
+        return (text.contains("səni kim") || text.contains("yaradıcın") || text.contains("kim yaradıb") || text.contains("developer") || text.contains("creator"))
     }
 }

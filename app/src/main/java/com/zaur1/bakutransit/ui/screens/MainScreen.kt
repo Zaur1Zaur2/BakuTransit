@@ -106,7 +106,7 @@ fun MainScreen(
             // OTA Dialog
             newVersion?.let { version ->
                 AlertDialog(
-                    onDismissRequest = { transitViewModel.dismissUpdateDialog() },
+                    onDismissRequest = { /* Keep visible */ },
                     title = { Text("Yeni Yenilənmə Mövcuddur!") },
                     text = { Text("Tətbiqin yeni versiyası ($version) hazırdır. İndi yükləyib quraşdıraq?") },
                     confirmButton = {
