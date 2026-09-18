@@ -14,7 +14,7 @@ class TransitRepository(private val transitDao: TransitDao) {
     val allStops: Flow<List<TransitStopEntity>> = transitDao.getAllStops()
 
     suspend fun prePopulateData() {
-        // Update both every time to ensure data consistency
+        // Update bus routes to ensure all are present
         val busRoutes = listOf(
             BusRouteEntity("bus_1", "1", "28 May m/st - Neftçilər m/st", "28 May m/st", "Neftçilər m/st", "06:00 - 23:59", 8, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r3", "m_r9")),
             BusRouteEntity("bus_2", "2", "B.Avtovağzal - Dərnəgül m/st", "B.Avtovağzal", "Dərnəgül m/st", "05:48 - 23:30", 10, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_p2", "m_g1")),
@@ -69,6 +69,7 @@ class TransitRepository(private val transitDao: TransitDao) {
             BusRouteEntity("bus_h1", "H1", "Hava Limanı - 28 May m/st", "Hava Limanı", "28 May m/st", "06:00 - 01:00", 30, 1.50, VehicleModel.NEOPLAN_TOURLINER, listOf("hub_airport", "m_r3")),
             BusRouteEntity("bus_m8", "M8", "Maştağa qəs - Gənclik m/st", "Maştağa qəs", "Gənclik m/st", "05:40 - 22:15", 20, 0.60, VehicleModel.BMC_PROCITY_12M, listOf("m_r4"))
         )
+        
         transitDao.insertBusRoutes(busRoutes)
 
         if (allStops.first().isEmpty()) {

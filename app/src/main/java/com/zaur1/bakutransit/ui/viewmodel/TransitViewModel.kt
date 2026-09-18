@@ -27,7 +27,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
-import java.util.Locale
 import kotlin.math.*
 
 class TransitViewModel(private val repository: TransitRepository) : ViewModel() {
@@ -93,20 +92,25 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
                     if (body != null) {
                         val json = Gson().fromJson(body, JsonObject::class.java)
                         val latestTag = json.get("tag_name").asString
-                        if (latestTag != "v1.1.5") _newVersion.value = latestTag
+                        // Match with the current hardcoded version in VM for comparison
+                        if (latestTag != "v1.1.4") _newVersion.value = latestTag
                     }
                 } catch (e: Exception) { e.printStackTrace() }
             }
         }
     }
 
+    fun dismissUpdateDialog() {
+        _newVersion.value = null
+    }
+
     fun downloadAndInstallApk(context: Context) {
         _isDownloading.value = true
-        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.5.apk")
+        val destinationFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "v.1.1.4.apk")
         if (destinationFile.exists()) destinationFile.delete()
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.5.apk"))
+        val request = DownloadManager.Request(Uri.parse("https://github.com/Zaur1zaur2/BakuTransit/releases/latest/download/v.1.1.4.apk"))
             .setTitle("Baku Transit")
             .setDescription("Yenilənmə yüklənir...")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -161,10 +165,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
 
     fun setDestination(latLng: LatLng?) { _destination.value = latLng }
 
-    /**
-     * Touch radius increased to 0.75km for easier tapping on Note 3 screen.
-     */
-    fun findStopAt(lat: Double, lng: Double, radiusKm: Double = 0.75): TransitStopEntity? {
+    fun findStopAt(lat: Double, lng: Double, radiusKm: Double = 0.5): TransitStopEntity? {
         val clickLoc = LatLng(lat, lng)
         val candidates = allStops.value.filter { calculateDistance(clickLoc, LatLng(it.latitude, it.longitude)) <= radiusKm }
         if (candidates.isEmpty()) return null
@@ -175,6 +176,7 @@ class TransitViewModel(private val repository: TransitRepository) : ViewModel() 
     private fun executeRouting(o: LatLng, d: LatLng) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                // profile=foot for walking
                 val foot = fetchGH(o, d, "foot")
                 _routePoints.value = foot.first
                 _footInfo.value = foot.second

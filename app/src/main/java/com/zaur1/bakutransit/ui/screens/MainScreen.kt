@@ -121,7 +121,7 @@ fun MainScreen(
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { transitViewModel.setDestination(null) }) {
+                        TextButton(onClick = { transitViewModel.dismissUpdateDialog() }) {
                             Text("Bağla")
                         }
                     }
